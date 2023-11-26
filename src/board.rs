@@ -88,7 +88,7 @@ impl SudokuBoard {
             return Err(SetError::Col);
         }
 
-        if value > 10 {
+        if value > 9 {
             return Err(SetError::Value);
         }
 
@@ -141,7 +141,7 @@ pub enum InvalidUnit {
     Empty,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum SetError {
     Row,
     Col,
@@ -153,7 +153,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_display_ascii() {
+    fn test_as_ascii() {
         let mut board = SudokuBoard::new();
         board.set_value(0, 0, 1).unwrap();
         board.set_value(0, 8, 8).unwrap();
@@ -324,5 +324,22 @@ mod tests {
         let board = SudokuBoard { grid };
 
         assert_eq!(board.is_legal(), Ok(()));
+    }
+
+    #[test]
+    fn test_set_move_valid() {
+        let mut board = SudokuBoard::new();
+        assert_eq!(board.set_value(0, 0, 0), Ok(()));
+        assert_eq!(board.set_value(8, 0, 0), Ok(()));
+        assert_eq!(board.set_value(0, 8, 0), Ok(()));
+        assert_eq!(board.set_value(0, 0, 9), Ok(()));
+    }
+
+    #[test]
+    fn test_set_move_invalid() {
+        let mut board = SudokuBoard::new();
+        assert_eq!(board.set_value(9, 0, 0), Err(SetError::Row));
+        assert_eq!(board.set_value(0, 9, 0), Err(SetError::Col));
+        assert_eq!(board.set_value(0, 0, 10), Err(SetError::Value));
     }
 }
